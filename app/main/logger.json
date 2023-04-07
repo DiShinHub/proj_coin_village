@@ -1,0 +1,45 @@
+{
+  "version": 1,
+  "disable_existing_loggers": false,
+  "formatters": {
+    "basic": {
+      "format": "%(asctime)s.%(msecs)03d[pid:%(process)d][%(module)s:%(lineno)d:%(levelname)s]%(message)s",
+      "datefmt": "%Y-%m-%d %H:%M:%S"
+    }
+  },
+  "handlers": {
+    "console": {
+      "class": "logging.StreamHandler",
+      "level": "INFO",
+      "formatter": "basic"
+    },
+    "main_handler": {
+      "class": "logging.handlers.TimedRotatingFileHandler",
+      "level": "INFO",
+      "formatter": "basic",
+      "filename": "./log/main.log",
+      "when": "midnight",
+      "interval": 1,
+      "encoding": "utf-8",
+      "backupCount": 7
+    },
+    "file_error": {
+      "class": "logging.handlers.TimedRotatingFileHandler",
+      "level": "ERROR",
+      "formatter": "basic",
+      "filename": "./log/error.log",
+      "when": "midnight",
+      "interval": 1,
+      "encoding": "utf-8",
+      "backupCount" : 7
+    }
+  },
+  "root": {"handlers": ["console", "main_handler", "file_error"], "level": "INFO"},
+  "loggers": {
+    "debug": {
+      "level": "DEBUG",
+      "handlers": ["main_handler", "file_error"],
+      "propagate": true
+    }
+  }
+}
