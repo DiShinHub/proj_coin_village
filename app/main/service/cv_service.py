@@ -1,13 +1,14 @@
 from app.main.commons.classes.mysql import *
 from app.main.commons.classes.upbit import *
+from app.main.commons.classes.redis import *
 
 
-class Skills():
+class Cv():
 
     def __init__(self):
         self.mysql = Mysql()
         self.upbit = Upbit()
-
+        self.redis = Redis()
 
     def percent_buy(self, req_data):
         """ 
@@ -45,7 +46,6 @@ class Skills():
             "message": "정상 처리되었습니다"
         }
         return response_object, 201
-    
 
     def percent_sell(self, req_data):
         """ 
@@ -84,19 +84,83 @@ class Skills():
         }
         return response_object, 201
 
+    def on_service(self, req_data):
+        """ 
+        def description : 서비스 on
 
-    def night_owl_protocol(self):
+        Returns
+        response_object : 결과 (dict)
+        -------
         """
-        솔라나 요청 오면 
-        솔라나 관련 hdate 다 지워버리고 
-        
-        
+
+        # 필수 값 체크
+        mendatory_list = [
+            "service_code",
+            "ticker"
+        ]
+        for mendatory in mendatory_list:
+            if mendatory not in req_data:
+                raise RequiredException(msg=f"필수 값 누락입니다, *{mendatory}")
+            
+        key = self.convert_service_code_to_key(req_data["service_code"])
+
+        self.redis.hset_data(key, req_data["ticker"], True)
+
+        # 결과
+        response_object = {
+            "status": "success",
+            "message": "정상 처리되었습니다"
+        }
+        return response_object, 201
+    
+    def off_night_owl(self, req_data):
+        """ 
+        def description : 밤부엉이 서비스 off
+
+        Returns
+        response_object : 결과 (dict)
+        -------
         """
 
-        # 나이트 오울 특정 티커 관련 된 레디스를 다 지워버리고 
+        # 필수 값 체크
+        mendatory_list = [
+            "service_code",
+            "ticker"
+        ]
+        for mendatory in mendatory_list:
+            if mendatory not in req_data:
+                raise RequiredException(msg=f"필수 값 누락입니다, *{mendatory}")
+        
+        key = self.convert_service_code_to_key(req_data["service_code"])
 
-        # 나이트 오울 티커에 담아서 
-        return
+        self.redis.hdel_data(key, req_data["ticker"])
+        
+        # 결과
+        response_object = {
+            "status": "success",
+            "message": "정상 처리되었습니다"
+        }
+        return response_object, 201
 
-    def highnoon_eagle_protocol(self):
-        return
+    def convert_service_code_to_key(self, code):
+        """ 
+        def description : 코드 키 변환 
+
+        Returns
+        response_object : 결과 (dict)
+        -------
+        """
+            
+        if code == "00":
+            key = "night_owls_target_tickers"
+            
+        elif code == "01":
+            key = "high_noon_eagles_target_tickers"
+            
+        elif code == "02":
+            key = "baby_hunter_pumas_target_tickers"
+            
+        elif code == "03":
+            key = "good_boy_poodle_target_tickers"
+        
+        return key

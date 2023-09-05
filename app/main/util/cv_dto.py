@@ -2,5 +2,5 @@
 from flask_restplus import Namespace, fields
 
 
-class SkillsDto:
-    api = Namespace('skills', description='skills related operations')
+class CvDto:
+    api = Namespace('cv', description='CvDto related operations')
