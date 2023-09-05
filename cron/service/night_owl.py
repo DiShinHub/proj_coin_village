@@ -10,9 +10,6 @@ from module.log import *
 from module.redis import *
 from common.function.common_function import *
 
-import time
-
-
 class NightOwlService:
 
     def __init__(self):
@@ -65,6 +62,14 @@ class NightOwlService:
 
         return
 
+    def save_msg_on_queue(self, msg):
+        """
+        def description : 메세지 큐에 저장
+        """
+
+        self.redis.hupd_date("msg_group_B", datetime.datetime.now(), msg)
+        return
+    
     """
     SETTER
     """
@@ -89,9 +94,7 @@ class NightOwlService:
         def description : 과거데이터 조회
         """
 
-        self.prev_bollinger_state = self.redis.hget_data(self.pref_bollinger_state, self.ticker)        # 볼린저 상태 값 
-
-        
+        self.prev_bollinger_state = self.redis.hget_data(self.pref_bollinger_state, self.ticker)        # 볼린저 상태 값         
         self.prev_minimum_price = self.redis.hget_data(self.pref_minimum_price, self.ticker)             # 최저가
         self.prev_maximum_price = self.redis.hget_data(self.pref_maximum_price, self.ticker)             # 최고가
 
@@ -186,7 +189,7 @@ class NightOwlService:
         self.redis.hdel_data(self.pref_maximum_price, self.ticker)
 
         # 메세지 전송
-        self.slack.post_to_slack(f"무너짐이 감시 되었습니다. 모니터링을 시작합니다. {datetime.datetime.now()}")
+        # self.save_msg_on_queue(f"무너짐이 감시 되었습니다. 모니터링을 시작합니다. ")
 
         return
 
@@ -235,8 +238,8 @@ class NightOwlService:
             self.redis.hdel_data(self.pref_minimum_price, self.ticker)
             self.redis.hdel_data(self.pref_maximum_price, self.ticker)
 
-            # 메세지 전송 (TODO : 삭제 예정)
-            self.slack.post_to_slack(f"상승세를 감지하였습니다. 모니터링을 중단합니다. {datetime.datetime.now()}")
+            # 메세지 전송
+            # self.save_msg_on_queue(f"상승세를 감지하였습니다. 모니터링을 중단합니다.")
 
         return
 
@@ -249,7 +252,7 @@ class NightOwlService:
         """
         if self.redis.hget_data(self.pref_bbbb_price, self.ticker):
             
-            self.slack.post_to_slack(f"매수를 시행하였습니다. {datetime.datetime.now()}")
+            self.slack.post_msg(f"매수를 시행하였습니다. {datetime.datetime.now()}")
 
             # Redis 갱신
             self.redis.hupd_date(self.pref_order_cnt, self.ticker, (self.order_cnt + 0.01))
@@ -272,7 +275,6 @@ class NightOwlService:
 
         """
 
-
         # 티커 셋팅 
         self.ticker = ticker
         self.upbit.set_ticker(self.ticker)
@@ -282,7 +284,7 @@ class NightOwlService:
         self.set_current_data()
         self.set_standard_data()
         
-        #self.slack.post_to_slack(f"{self.current_bollinger_state}")
+        #self.slack.post_msg(f"{self.current_bollinger_state}")
 
         # 이전 데이터 갱신
         self.update_prev_data()

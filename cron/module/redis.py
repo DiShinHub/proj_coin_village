@@ -95,7 +95,9 @@ class Redis():
                 self.redis.hset(key, field, val)
 
         except Exception as ex :
-           self.slack.post_to_slack(f"error on hset_data : {str(ex)}")
+           pass
+           return
+           #self.slack.post_msg(f"error on hset_data : {str(ex)}")
 
     def hget_data(self, key, field):
 
@@ -106,6 +108,21 @@ class Redis():
                 return None
             
             return bytes.decode(data)
+    
+        except Exception as ex :
+            pass
+
+    def hgetall_data(self, key):
+
+        try : 
+
+            data = self.redis.hgetall(key)
+            if data is None:
+                return None
+
+            # 이진 데이터를 문자열로 변환하고 딕셔너리를 생성
+            result = {field.decode('utf-8'): value.decode('utf-8') for field, value in data.items()}
+            return result
     
         except Exception as ex :
             pass
@@ -130,7 +147,9 @@ class Redis():
                 self.redis.hdel(key, field)
 
         except Exception as ex :
-           self.slack.post_to_slack(f"error on hdel_data : {str(ex)}")
+           pass
+           return
+           #self.slack.post_msg(f"error on hdel_data : {str(ex)}")
     
     def hupd_date(self, key, field, val):   
 
@@ -140,7 +159,9 @@ class Redis():
                 self.hset_data(key, field, val)
 
         except Exception as ex :
-           self.slack.post_to_slack(f"error on hupd_date : {str(ex)}")
+           pass
+           return
+           #self.slack.post_msg(f"error on hupd_date : {str(ex)}")
 
     def flushall(self):
 

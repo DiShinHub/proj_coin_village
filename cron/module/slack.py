@@ -2,16 +2,16 @@ import os
 import json
 import requests
 import slack_sdk
+import datetime
 from dotenv import load_dotenv
 load_dotenv()
-
 
 class Slack():
 
     def __init__(self):
         self.slack_client = slack_sdk.WebClient(token=os.getenv("SLACK_TOKEN"))
 
-    def post_to_slack(self, msg):
+    def post_msg(self, msg):
         """ 
         def description : 슬랙 메세지 전송 
 
@@ -26,8 +26,14 @@ class Slack():
         self.slack_client.chat_postMessage(
             channel='#coinvillage',
             text=msg
-
         )
+
+        response_object = {
+            "status": "success",
+            "message": "success"
+        }
+        return response_object
+    
         # response = requests.post(
         #     self.webhook_url, data=slack_data,
         #     headers={"Content-Type": "application/json"}
@@ -39,9 +45,3 @@ class Slack():
         #         "message": str(response.text)
         #     }
         #     return response_object
-
-        response_object = {
-            "status": "success",
-            "message": "success"
-        }
-        return response_object

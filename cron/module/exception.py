@@ -33,7 +33,7 @@ time at : {datetime.datetime.now()}
 """
 
         # 슬랙 전송
-        slack.post_to_slack(msg_s)
+        slack.post_msg(msg_s)
 
 
 class RuledException():
@@ -61,7 +61,7 @@ time at : {datetime.datetime.now()}
 """
 
         # 슬랙 전송
-        slack.post_to_slack(msg_s)
+        slack.post_msg(msg_s)
 
 
 class Success():
@@ -89,4 +89,4 @@ time at : {datetime.datetime.now()}
 """
 
         # 슬랙 전송
-        slack.post_to_slack(msg_s)
+        slack.post_msg(msg_s)
